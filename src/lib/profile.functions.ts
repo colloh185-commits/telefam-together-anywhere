@@ -48,7 +48,7 @@ export const getMyProfile = createServerFn({ method: "POST" })
 
 export const suggestUsername = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ base: z.string().max(254) }).parse(input))
+  .validator((input: unknown) => z.object({ base: z.string().max(254) }).parse(input))
   .handler(async ({ data, context }) => {
     const base = usernameFromEmail(data.base.includes("@") ? data.base : `${data.base}@x`);
     const candidates = [base];
@@ -62,7 +62,7 @@ export const suggestUsername = createServerFn({ method: "POST" })
 
 export const checkUsername = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ username: z.string().max(40) }).parse(input))
+  .validator((input: unknown) => z.object({ username: z.string().max(40) }).parse(input))
   .handler(async ({ data, context }) => {
     const u = data.username.trim().toLowerCase();
     if (!USERNAME_RE.test(u)) return { available: false, valid: false };
@@ -72,7 +72,7 @@ export const checkUsername = createServerFn({ method: "POST" })
 
 export const uploadAvatar = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         // base64 JPEG, capped at ~2MB decoded
@@ -148,7 +148,7 @@ const profileSchema = z.object({
 
 export const saveProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => profileSchema.parse(input))
+  .validator((input: unknown) => profileSchema.parse(input))
   .handler(async ({ data, context }) => {
     const sec = await import("./security.server");
     const { parsePhoneNumberFromString } = await import("libphonenumber-js/min");
@@ -220,7 +220,7 @@ const eventSchema = z.object({
 
 export const trackEvents = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ events: z.array(eventSchema).min(1).max(25), device: deviceSchema }).parse(input),
   )
   .handler(async ({ data, context }) => {

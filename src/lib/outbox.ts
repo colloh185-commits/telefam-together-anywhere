@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackEvents } from "./profile.functions";
 import { getDeviceId } from "./device";
 
-type Item = { event: string; ts: string; meta?: Record<string, string | number | boolean | null> };
+type Item = { event: string; ts: string; meta?: Record<string, string | number | boolean | null> | undefined };
 const KEY = "tf.outbox";
 const MAX = 300;
 let flushing = false;

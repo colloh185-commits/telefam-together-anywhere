@@ -27,7 +27,7 @@ function publicAuthClient() {
 const GENERIC_WAIT = { ok: false as const, retryAfter: 60 };
 
 export const requestEmailCode = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({ email: emailSchema, device: deviceSchema, redirectTo: z.string().url().max(300) })
       .parse(input),
@@ -62,7 +62,7 @@ export const requestEmailCode = createServerFn({ method: "POST" })
     const client = await publicAuthClient();
     const { error } = await client.auth.signInWithOtp({
       email: data.email,
-      options: { shouldCreateUser: true, emailRedirectTo: redirectTo || undefined },
+      options: redirectTo ? { shouldCreateUser: true, emailRedirectTo: redirectTo } : { shouldCreateUser: true },
     });
     if (error) {
       console.error("otp send failed", error.status, error.message);
@@ -74,7 +74,7 @@ export const requestEmailCode = createServerFn({ method: "POST" })
   });
 
 export const verifyEmailCode = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({ email: emailSchema, code: z.string().regex(/^[0-9]{6,8}$/), device: deviceSchema })
       .parse(input),

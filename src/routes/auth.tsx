@@ -62,6 +62,8 @@ function AuthPage() {
   const [left, setLeft] = useState(0);
   const [shake, setShake] = useState(false);
   const lastSubmit = useRef(0);
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
 
   // Already signed in (or arrived from the email link): continue.
   useEffect(() => {
@@ -208,7 +210,7 @@ function AuthPage() {
           </div>
           {emailError && <p className="mt-1.5 text-xs text-destructive">{emailError}</p>}
 
-          <Button type="submit" variant="brand" size="cta" className="mt-4 w-full" disabled={busy}>
+          <Button type="submit" variant="brand" size="cta" className="mt-4 w-full" disabled={busy || !ready}>
             {busy ? <Loader2 className="animate-spin" /> : "Send OTP"}
           </Button>
 
