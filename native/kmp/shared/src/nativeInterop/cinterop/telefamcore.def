@@ -1,0 +1,3 @@
+headers = telefam_core.h
+package = telefamcore
+staticLibraries = libtelefamcore.a

@@ -28,3 +28,12 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules (Telefam)
+- Business rules (code-resend ladder, minimum age, username format, sanitizing) live in `src/lib/rules.ts` and are mirrored in `native/kmp/.../domain/Rules.kt`, `native/core-cpp/src/engine.cpp` and `native/backend-go/internal/rules`; change all together. Why: web, apps and backend must enforce identical rules.
+- Email code send/verify go through `src/lib/auth.functions.ts` (server), never directly from the browser, so per-account/device/IP throttling (`throttle_hit` SQL function, service role only) always applies.
+- Raw IPs, emails and device ids are never stored; only HMAC hashes with the `FINGERPRINT_PEPPER` secret. Why: privacy + still usable as rate-limit keys.
+- Avatars are uploaded only via the `uploadAvatar` server function: sniff JPEG, decode, resize to 512, re-encode, fingerprint (sha256 + dHash), store as `<userId>/<uuid>.jpg` in the private `avatars` bucket; read via signed URLs.
+- `_authenticated/route.tsx` falls back to the local session when the network fails (not on auth rejection). Why: offline-first, returning users are never sent back to sign-in.
+- Client actions are logged through the offline outbox (`src/lib/outbox.ts` -> `trackEvents`), server actions via `logActivity`.
+- `native/` is source only (KMP + Compose, C++ core, Go API); it is not built by the web app.
